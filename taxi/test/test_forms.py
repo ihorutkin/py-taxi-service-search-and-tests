@@ -79,10 +79,10 @@ class TestDriverForms(TestCase):
 
     def test_driver_form(self):
         form_data = {
-            "username": "new_driver",
+            "username": "another_driver",
             "license_number": "HRN84739",
-            "password1": "root1234!",
-            "password2": "root1234!"
+            "password1": "Root1234",
+            "password2": "Root1234"
         }
         form = DriverCreationForm(form_data)
         self.assertTrue(form.is_valid())
