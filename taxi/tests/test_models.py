@@ -10,7 +10,10 @@ class ManufacturerModelTest(TestCase):
             country="USA"
         )
 
-        self.assertEqual(str(test_manufacture), f"{test_manufacture.name} {test_manufacture.country}")
+        self.assertEqual(str(test_manufacture),
+                         f"{test_manufacture.name} "
+                         f"{test_manufacture.country}"
+                         )
 
 
 class DriverModelTest(TestCase):
