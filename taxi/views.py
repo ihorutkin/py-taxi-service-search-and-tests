@@ -14,7 +14,7 @@ from taxi.forms import (
     ManufacturerNameSearchForm,
     CarModelSearchForm,
     DriverUsernameSearchForm
-    )
+)
 
 
 @login_required
