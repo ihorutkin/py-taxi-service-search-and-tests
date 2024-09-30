@@ -100,11 +100,22 @@ class TestDriverForms(TestCase):
         }
         form = DriverUsernameSearchForm(data=form_data)
         self.assertTrue(form.is_valid())
+        search_username = form.cleaned_data.get("username")
+        results = get_user_model().objects.filter(
+            username__icontains=search_username
+        )
+        self.assertEqual(results.count(), 1)
+        self.assertEqual(results.first().username, "new_driver")
 
     def test_update_license_form_correct_num(self):
+        self.user.license_number = "OLD12345"
+        self.user.save()
         form_data = {"license_number": "HRN84739"}
-        form = DriverLicenseUpdateForm(form_data)
+        form = DriverLicenseUpdateForm(form_data, instance=self.user)
         self.assertTrue(form.is_valid())
+        form.save()
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.license_number, "HRN84739")
 
     def test_update_license_form_incorrect_num(self):
         form_data = {"license_number": "HrN8473"}

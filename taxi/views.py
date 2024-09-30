@@ -6,15 +6,15 @@ from django.urls import reverse_lazy
 from django.views import generic
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-from .models import Driver, Car, Manufacturer
-from .forms import (
+from taxi.models import Driver, Car, Manufacturer
+from taxi.forms import (
     DriverCreationForm,
     DriverLicenseUpdateForm,
     CarForm,
     ManufacturerNameSearchForm,
     CarModelSearchForm,
     DriverUsernameSearchForm
-)
+    )
 
 
 @login_required
@@ -50,7 +50,7 @@ class ManufacturerListView(LoginRequiredMixin, generic.ListView):
         return queryset
 
     def get_context_data(self, *, object_list=None, **kwargs):
-        context = super(ManufacturerListView, self).get_context_data()
+        context = super().get_context_data(**kwargs)
 
         name = self.request.GET.get("name", "")
 
@@ -89,7 +89,7 @@ class CarListView(LoginRequiredMixin, generic.ListView):
         return queryset
 
     def get_context_data(self, *, object_list=None, **kwargs):
-        context = super(CarListView, self).get_context_data()
+        context = super().get_context_data(**kwargs)
 
         model = self.request.GET.get("model", "")
 
@@ -130,7 +130,7 @@ class DriverListView(LoginRequiredMixin, generic.ListView):
         return queryset
 
     def get_context_data(self, *, object_list=None, **kwargs):
-        context = super(DriverListView, self).get_context_data()
+        context = super().get_context_data(**kwargs)
 
         username = self.request.GET.get("username", "")
 
