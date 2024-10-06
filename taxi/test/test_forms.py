@@ -67,11 +67,22 @@ class TestManufacturerForms(TestCase):
 
 class TestDriverForms(TestCase):
     def setUp(self):
-        self.user = get_user_model().objects.create_user(
+        self.user1 = get_user_model().objects.create_user(
             username="new_driver",
+            license_number="HRN84739",
             password="root1234",
         )
-        self.client.force_login(self.user)
+        self.user2 = get_user_model().objects.create_user(
+            username="another_driver",
+            license_number="HRN12345",
+            password="root1234",
+        )
+        self.user3 = get_user_model().objects.create_user(
+            username="some_other_driver",
+            license_number="HRN67890",
+            password="root1234",
+        )
+        self.client.force_login(self.user1)
 
         self.manufacturer = Manufacturer.objects.create(
             name="Test manufacture", country="USA"
@@ -79,13 +90,19 @@ class TestDriverForms(TestCase):
 
     def test_driver_form(self):
         form_data = {
-            "username": "another_driver",
-            "license_number": "HRN84739",
+            "username": "fourth_driver",
+            "license_number": "HRN84735",
             "password1": "Root1234",
             "password2": "Root1234"
         }
-        form = DriverCreationForm(form_data)
+        form = DriverCreationForm(data=form_data)
         self.assertTrue(form.is_valid())
+        new_driver = form.save()
+        self.assertIsNotNone(new_driver)
+        created_user = get_user_model().objects.get(username="fourth_driver")
+        self.assertEqual(created_user.username, "fourth_driver")
+        self.assertEqual(created_user.license_number, "HRN84735")
+        self.assertTrue(created_user.check_password("Root1234"))
 
     def test_driver_search_form_with_arg(self):
         form_data = {
@@ -104,18 +121,18 @@ class TestDriverForms(TestCase):
         results = get_user_model().objects.filter(
             username__icontains=search_username
         )
-        self.assertEqual(results.count(), 1)
+        self.assertEqual(results.count(), 3)
         self.assertEqual(results.first().username, "new_driver")
 
     def test_update_license_form_correct_num(self):
-        self.user.license_number = "OLD12345"
-        self.user.save()
+        self.user1.license_number = "OLD12345"
+        self.user1.save()
         form_data = {"license_number": "HRN84739"}
-        form = DriverLicenseUpdateForm(form_data, instance=self.user)
+        form = DriverLicenseUpdateForm(form_data, instance=self.user1)
         self.assertTrue(form.is_valid())
         form.save()
-        self.user.refresh_from_db()
-        self.assertEqual(self.user.license_number, "HRN84739")
+        self.user1.refresh_from_db()
+        self.assertEqual(self.user1.license_number, "HRN84739")
 
     def test_update_license_form_incorrect_num(self):
         form_data = {"license_number": "HrN8473"}
