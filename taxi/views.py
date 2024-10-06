@@ -39,11 +39,12 @@ def index(request):
 
 
 class ManufacturerListView(LoginRequiredMixin, generic.ListView):
+    model = Manufacturer
     paginate_by = 5
 
     def get_queryset(self):
         name = self.request.GET.get("name")
-        queryset = Manufacturer.objects.all()
+        queryset = super().get_queryset()
 
         if name:
             return queryset.filter(name__icontains=name)
