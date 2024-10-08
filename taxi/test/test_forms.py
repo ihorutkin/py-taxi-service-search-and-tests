@@ -8,7 +8,7 @@ from taxi.forms import (
     DriverUsernameSearchForm,
     DriverCreationForm
 )
-from taxi.models import Manufacturer
+from taxi.models import Manufacturer, Car
 
 
 class TestCarForms(TestCase):
@@ -19,9 +19,11 @@ class TestCarForms(TestCase):
         )
         self.client.force_login(self.user)
 
-        self.manufacturer = Manufacturer.objects.create(
-            name="Test manufacture", country="USA"
-        )
+        # Create some sample car models
+        self.manufacturer = Manufacturer.objects.create(name="Test Manufacture", country="USA")
+        self.car1 = Car.objects.create(model="M5", manufacturer=self.manufacturer)
+        self.car2 = Car.objects.create(model="Civic", manufacturer=self.manufacturer)
+        self.car3 = Car.objects.create(model="M3", manufacturer=self.manufacturer)
 
     def test_car_search_form_with_arg(self):
         form_data = {
@@ -30,12 +32,23 @@ class TestCarForms(TestCase):
         form = CarModelSearchForm(data=form_data)
         self.assertTrue(form.is_valid())
 
+        # Directly query the database based on the form input
+        results = Car.objects.filter(model__icontains=form.cleaned_data['model'])
+        self.assertEqual(results.count(), 1)
+        self.assertEqual(results.first().model, "M5")
+
     def test_car_search_form_without_arg(self):
         form_data = {
             "model": "",
         }
         form = CarModelSearchForm(data=form_data)
         self.assertTrue(form.is_valid())
+
+        results = Car.objects.all()  # Fetch all cars since no model is specified
+        self.assertEqual(results.count(), 3)
+        self.assertIn(self.car1, results)
+        self.assertIn(self.car2, results)
+        self.assertIn(self.car3, results)
 
 
 class TestManufacturerForms(TestCase):
@@ -46,16 +59,22 @@ class TestManufacturerForms(TestCase):
         )
         self.client.force_login(self.user)
 
-        self.manufacturer = Manufacturer.objects.create(
-            name="Test manufacture", country="USA"
-        )
+        # Create some sample manufacturers
+        self.manufacturer1 = Manufacturer.objects.create(name="Test Manufacture", country="USA")
+        self.manufacturer2 = Manufacturer.objects.create(name="Sample Manufacture", country="Canada")
+        self.manufacturer3 = Manufacturer.objects.create(name="Example Manufacture", country="UK")
 
     def test_manufacturer_search_form_with_arg(self):
         form_data = {
-            "name": "Test manufacture",
+            "name": "Test Manufacture",
         }
         form = ManufacturerNameSearchForm(data=form_data)
         self.assertTrue(form.is_valid())
+
+        # Directly query the database based on the form input
+        results = Manufacturer.objects.filter(name__icontains=form.cleaned_data['name'])
+        self.assertEqual(results.count(), 1)
+        self.assertEqual(results.first().name, "Test Manufacture")
 
     def test_manufacturer_search_form_without_arg(self):
         form_data = {
@@ -63,6 +82,12 @@ class TestManufacturerForms(TestCase):
         }
         form = ManufacturerNameSearchForm(data=form_data)
         self.assertTrue(form.is_valid())
+
+        results = Manufacturer.objects.all()  # Fetch all manufacturers since no name is specified
+        self.assertEqual(results.count(), 3)
+        self.assertIn(self.manufacturer1, results)
+        self.assertIn(self.manufacturer2, results)
+        self.assertIn(self.manufacturer3, results)
 
 
 class TestDriverForms(TestCase):
