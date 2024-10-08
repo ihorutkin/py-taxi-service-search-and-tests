@@ -20,10 +20,22 @@ class TestCarForms(TestCase):
         self.client.force_login(self.user)
 
         # Create some sample car models
-        self.manufacturer = Manufacturer.objects.create(name="Test Manufacture", country="USA")
-        self.car1 = Car.objects.create(model="M5", manufacturer=self.manufacturer)
-        self.car2 = Car.objects.create(model="Civic", manufacturer=self.manufacturer)
-        self.car3 = Car.objects.create(model="M3", manufacturer=self.manufacturer)
+        self.manufacturer = Manufacturer.objects.create(
+            name="Test Manufacture",
+            country="USA"
+        )
+        self.car1 = Car.objects.create(
+            model="M5",
+            manufacturer=self.manufacturer
+        )
+        self.car2 = Car.objects.create(
+            model="Civic",
+            manufacturer=self.manufacturer
+        )
+        self.car3 = Car.objects.create(
+            model="M3",
+            manufacturer=self.manufacturer
+        )
 
     def test_car_search_form_with_arg(self):
         form_data = {
@@ -32,8 +44,9 @@ class TestCarForms(TestCase):
         form = CarModelSearchForm(data=form_data)
         self.assertTrue(form.is_valid())
 
-        # Directly query the database based on the form input
-        results = Car.objects.filter(model__icontains=form.cleaned_data['model'])
+        results = Car.objects.filter(
+            model__icontains=form.cleaned_data["model"]
+        )
         self.assertEqual(results.count(), 1)
         self.assertEqual(results.first().model, "M5")
 
@@ -44,7 +57,7 @@ class TestCarForms(TestCase):
         form = CarModelSearchForm(data=form_data)
         self.assertTrue(form.is_valid())
 
-        results = Car.objects.all()  # Fetch all cars since no model is specified
+        results = Car.objects.all()
         self.assertEqual(results.count(), 3)
         self.assertIn(self.car1, results)
         self.assertIn(self.car2, results)
@@ -59,10 +72,18 @@ class TestManufacturerForms(TestCase):
         )
         self.client.force_login(self.user)
 
-        # Create some sample manufacturers
-        self.manufacturer1 = Manufacturer.objects.create(name="Test Manufacture", country="USA")
-        self.manufacturer2 = Manufacturer.objects.create(name="Sample Manufacture", country="Canada")
-        self.manufacturer3 = Manufacturer.objects.create(name="Example Manufacture", country="UK")
+        self.manufacturer1 = Manufacturer.objects.create(
+            name="Test Manufacture",
+            country="USA"
+        )
+        self.manufacturer2 = Manufacturer.objects.create(
+            name="Sample Manufacture",
+            country="Canada"
+        )
+        self.manufacturer3 = Manufacturer.objects.create(
+            name="Example Manufacture",
+            country="UK"
+        )
 
     def test_manufacturer_search_form_with_arg(self):
         form_data = {
@@ -71,10 +92,14 @@ class TestManufacturerForms(TestCase):
         form = ManufacturerNameSearchForm(data=form_data)
         self.assertTrue(form.is_valid())
 
-        # Directly query the database based on the form input
-        results = Manufacturer.objects.filter(name__icontains=form.cleaned_data['name'])
+        results = Manufacturer.objects.filter(
+            name__icontains=form.cleaned_data["name"]
+        )
         self.assertEqual(results.count(), 1)
-        self.assertEqual(results.first().name, "Test Manufacture")
+        self.assertEqual(
+            results.first().name,
+            "Test Manufacture"
+        )
 
     def test_manufacturer_search_form_without_arg(self):
         form_data = {
@@ -83,7 +108,7 @@ class TestManufacturerForms(TestCase):
         form = ManufacturerNameSearchForm(data=form_data)
         self.assertTrue(form.is_valid())
 
-        results = Manufacturer.objects.all()  # Fetch all manufacturers since no name is specified
+        results = Manufacturer.objects.all()
         self.assertEqual(results.count(), 3)
         self.assertIn(self.manufacturer1, results)
         self.assertIn(self.manufacturer2, results)
@@ -124,10 +149,20 @@ class TestDriverForms(TestCase):
         self.assertTrue(form.is_valid())
         new_driver = form.save()
         self.assertIsNotNone(new_driver)
-        created_user = get_user_model().objects.get(username="fourth_driver")
-        self.assertEqual(created_user.username, "fourth_driver")
-        self.assertEqual(created_user.license_number, "HRN84735")
-        self.assertTrue(created_user.check_password("Root1234"))
+        created_user = get_user_model().objects.get(
+            username="fourth_driver"
+        )
+        self.assertEqual(
+            created_user.username,
+            "fourth_driver"
+        )
+        self.assertEqual(
+            created_user.license_number,
+            "HRN84735"
+        )
+        self.assertTrue(
+            created_user.check_password("Root1234")
+        )
 
     def test_driver_search_form_with_arg(self):
         form_data = {
